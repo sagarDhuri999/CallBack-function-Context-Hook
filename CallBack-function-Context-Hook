@@ -1,0 +1,193 @@
+////////////////////////////////////////////////////////////////////////////  CallBack-function  ( Method 1 ) ////////////////////////////////////////////////////////////////////////
+
+
+
+import { useState } from "react";
+import ChildComponent from "./ChildComponent";
+import "./styles.css";
+
+export default function App() {
+  const [colour, setColour] = useState();
+  const Colourfixed = (colour) => {
+    setColour(colour);
+  };
+
+  return (
+    <div className="App">
+      <h1>Type Colour Name</h1>
+      <div className="box" style={{ background: colour }}></div>
+      <br />
+      <ChildComponent Colourfixed={Colourfixed} />
+    </div>
+  );
+}
+
+////////////////////////////////////////////////////////////////////////////  ChildComponent  ////////////////////////////////////////////////////////////////////////
+
+
+import { useState } from "react";
+
+export default function ChildComponent({ Colourfixed }) {
+  const [call, setCall] = useState("");
+  // const ColourUse = (e) => {
+  //   //  const { value } = e.target
+  //   //        setCall(value)
+  //   //   Colourfixed(value);
+
+  //   setCall(e.target.value);
+  // };
+  Colourfixed(call);
+
+  return <input placeholder="search..." type="text" onChange={(e)=>setCall(e.target.value)} />;
+}
+
+
+////////////////////////////////////////////////////////////////////////////  Context hook ( Method 2 )  ////////////////////////////////////////////////////////////////////////
+
+
+import { useState } from "react";
+import ChildComponent from "./ChildComponent";
+import "./styles.css";
+import { colurContext } from"./ColurContext"
+
+export default function App() {
+  const [colour, setColour] = useState();
+  
+
+
+  return (
+    <div className="App">
+      <colurContext.Provider value={{colour,setColour}}>
+      <h1>Type Colour Name</h1>
+      <div className="box" style={{ background: colour }}></div>
+      <br />
+      <ChildComponent/>
+      </colurContext.Provider>
+    </div>
+  );
+}
+
+
+////////////////////////////////////////////////////////////////////////////  ChildComponent  ////////////////////////////////////////////////////////////////////////
+
+
+
+import { useContext } from "react";
+import { colurContext } from "./ColurContext";
+
+export default function ChildComponent() {
+  const { setColour } = useContext(colurContext)
+
+  return <input placeholder="search..." type="text" onChange={(e)=>setColour(e.target.value)} />;
+}
+
+//////////////////////////////////////////////////////////////////////////// createContex   ////////////////////////////////////////////////////////////////////////
+
+
+import { createContext } from "react";
+
+ export const colurContext = createContext()
+
+
+////////////////////////////////////////////////////////////////////////////  Context hook ( Method 3 )  ////////////////////////////////////////////////////////////////////////
+
+
+
+import ChildComponent from "./ChildComponent";
+import "./styles.css";
+import { colurContext } from"./ColurContext"
+import { useContext } from "react";
+
+export default function App() {
+ 
+  const colourCtx = useContext(colurContext);
+  const {selectedColor} = colourCtx
+  
+
+
+  return (
+    <div className="App">
+      
+      <h1>Type Colour Name</h1>
+      <div className="box" style={{ background: selectedColor }}></div>
+      <br />
+      <ChildComponent/>
+      
+    </div>
+  );
+}
+
+
+////////////////////////////////////////////////////////////////////////////  ChildComponent  ////////////////////////////////////////////////////////////////////////
+
+import { useContext } from "react";
+
+import { colurContext } from "./ColurContext";
+
+export default function ChildComponent() {
+
+  const colourCtx = useContext(colurContext);
+  
+  const {onColourChange} = colourCtx
+  
+  return <input placeholder="search..." type="text" onChange={(e)=>onColourChange(e.target.value)} />;
+}
+
+
+//////////////////////////////////////////////////////////////////////////// createContex  ////////////////////////////////////////////////////////////////////////
+
+
+ 
+import { createContext, useState } from "react";
+
+export const colurContext = createContext({
+  //  selectedColor:null,
+  //  onColourChange:null,     // use or not use its work fine
+})
+////////////////////// colurContext & olurContextProvider are diffrent////////////////////////////
+export const ColurContextProvider=({children})=>{
+  const [colour, setColour] = useState('');   //step 1
+
+  const handleColorChange = (c) =>{        // step 2
+    setColour(c)
+  }
+
+  const contextValue={                 //step 3
+    selectedColor:colour,
+    onColourChange:handleColorChange,
+  }
+
+  return (                              //step4
+     <colurContext.Provider value={contextValue}>
+       {children}
+     </colurContext.Provider>
+  )
+////////////////////////////// Wrap in ColurContextProvider index.js ////////////////////
+
+
+}
+
+//////////////////////////////////////////////////////////////////////////// index.js ////////////////////////////////////////////////////////////////////////
+
+
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+import App from "./App";
+import {ColurContextProvider} from './ColurContext';
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+
+root.render(
+  <StrictMode>
+    <ColurContextProvider>
+    <App />
+    
+    </ColurContextProvider>
+  </StrictMode>
+);
+
+
+
+
